@@ -17,16 +17,26 @@ const Message = mongoose.model('Message', {
     message: String,
 })
 
-app.get('/messages', async (req, res) => {
-    const messages = await Message.find({}).catch(_err => sendStatus(500))
-    res.send(messages)
+app.get('/messages', async (_req, res) => {
+    try {
+        const messages = await Message.find({})
+        res.send(messages)
+    } catch (error) {
+        sendStatus(500)
+        return console.error(error)
+    }
 })
 app.post('/messages', async (req, res) => {
-    const message = new Message(req.body)
-    await message.save().catch(_err => sendStatus(500))
+    try {
+        const message = new Message(req.body)
+        await message.save()
 
-    io.emit('message', req.body)
-    res.sendStatus(200)
+        io.emit('message', req.body)
+        res.sendStatus(200)
+    } catch (error) {
+        sendStatus(500)
+        return console.error(error)
+    }
 })
 
 io.on('connection', socket => {
@@ -36,7 +46,9 @@ io.on('connection', socket => {
 const dbConnect = async () => {
     await mongoose.connect(process.env.DB_CONNECTION_STRING)
 }
-dbConnect().catch(err => console.log('mongo db connection error', err))
+dbConnect()
+    .then(() => console.log('mongo db connected'))
+    .catch(err => console.log('mongo db connection error', err))
 
 server.listen(3000, () => {
     console.log('server is listening on port', server.address().port)
