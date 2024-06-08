@@ -26,6 +26,16 @@ app.get('/messages', async (_req, res) => {
         return console.error(error)
     }
 })
+app.get('/messages/:user', async (req, res) => {
+    try {
+        const user = req.params.user
+        const messages = await Message.find({ name: user })
+        res.send(messages)
+    } catch (error) {
+        sendStatus(500)
+        return console.error(error)
+    }
+})
 app.post('/messages', async (req, res) => {
     try {
         const message = new Message(req.body)
