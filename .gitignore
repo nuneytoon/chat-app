@@ -1,0 +1,8 @@
+# Depenedecies
+node_modules/
+
+# npm cache
+.npm
+
+# dotenv files
+.env
